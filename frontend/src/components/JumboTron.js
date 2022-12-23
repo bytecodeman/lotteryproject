@@ -40,20 +40,11 @@ function JumboTron() {
             <ul>
               <li>
                 <a
-                  href="https://github.com/bytecodeman/lotteryquickpick-frontend.git"
+                  href="https://github.com/bytecodeman/lotteryproject"
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Front End Source Code
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://github.com/bytecodeman/lotteryquickpick-backend.git"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Back End Source Code
+                  Source Code for Both FrontEnd and BackEnd
                 </a>
               </li>
             </ul>
