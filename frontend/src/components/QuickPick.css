@@ -1,0 +1,34 @@
+.quick-pick {
+  padding: 0;
+}
+
+.quick-pick.fancy {
+  padding: 0.5rem 0;
+}
+
+.quick-pick span {
+  margin-right: 1rem;
+}
+
+.quick-pick span.pball {
+  margin-left: 1.5rem;
+}
+
+.quick-pick.fancy span.pball {
+  margin-left: 2rem;
+}
+
+.quick-pick.fancy span {
+  color: white;
+  font-weight: bold;
+  font-size: 1.5rem;
+  font-family: 'Courier New', Courier, monospace;
+  border-radius: 50%;
+  height: 3rem;
+  width: 3rem;
+  background: radial-gradient(circle at 3rem 3rem, #5cabff, #000);
+  margin: auto 0.25rem;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,0 +1,39 @@
+#results {
+  margin-bottom: 1.5rem;
+}
+
+.quickpick-list {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.5rem;
+  font-weight: bold;
+  counter-reset: list;
+  white-space: pre;
+  padding-left: 0;
+  margin-top: 1.5rem;
+}
+
+.quickpick-list li:nth-child(even) {
+  background-color: #EEE;
+}
+
+.quickpick-list>li {
+  list-style: none;
+}
+
+.quickpick-list>li:nth-child(n):before {
+  counter-increment: list;
+  content: " " counter(list) ") ";
+}
+
+.quickpick-list>li:nth-child(n+10):before {
+  counter-increment: list;
+  content: counter(list) ") ";
+}
+
+.quickpick-list.onlyone>li:nth-child(n):before {
+  content: "";
+}
+
+.quickpick-list.onlyone>li:nth-child(n+10):before {
+  content: "";
+}
