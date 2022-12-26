@@ -8,12 +8,17 @@ require("dotenv").config();
 const randomLibrary = require("./randomLibrary");
 const mongo = require("./mongo");
 const { convertToHTML, convertToText } = require("./quickPicksToEmail");
-const mailer = require("./oauth2mailer");
+//const mailer = require("./oauth2mailer");
+const mailer = require("./mailer");
+const cors = require("cors");
 
 const app = express();
+app.use(cors());
 const port = process.env.PORT || 5000;
 const listener = app.listen(port, "0.0.0.0", () =>
-  console.log("Listening on Port " + listener.address().port)
+  console.log(
+    "CORS-enabled web server listening on Port " + listener.address().port
+  )
 );
 
 app.set("json replacer", function (key, value) {
@@ -101,7 +106,7 @@ function gamesSupported() {
 
 app.use(express.static(path.join(__dirname, "build")));
 
-app.get("/supportedgames", (req, res) => {
+app.get("/api/supportedgames", (req, res) => {
   const method = "GET";
   let message;
   let gs;
@@ -123,7 +128,7 @@ app.get("/supportedgames", (req, res) => {
   res.status(200).json(data);
 });
 
-app.post("/supportedgames", (req, res) => {
+app.post("/api/supportedgames", (req, res) => {
   const method = "POST";
   let message;
   let gs;
@@ -172,7 +177,7 @@ function getTheQuickPicks(reqData) {
   return { longName, padding, qp };
 }
 
-app.get("/:game/:number", (req, res) => {
+app.get("/api/:game/:number", (req, res) => {
   const reqData = req.params;
   const method = "GET";
   let message;
@@ -196,7 +201,7 @@ app.get("/:game/:number", (req, res) => {
   res.status(status).json(data);
 });
 
-app.post("/getquickpicks", async (req, res) => {
+app.post("/api/getquickpicks", async (req, res) => {
   const reqData = req.body;
   const method = "POST";
   let message;
@@ -253,7 +258,7 @@ const validRecaptcha = async (token, ip) => {
   }
 };
 
-app.post("/verifytoken", async (req, res) => {
+app.post("/api/verifytoken", async (req, res) => {
   const reqData = req.body;
   const token = reqData.token;
   let status;
@@ -267,7 +272,7 @@ app.post("/verifytoken", async (req, res) => {
   res.json({ success: status });
 });
 
-app.get("/log", checkSignIn, (request, response) => {
+app.get("/api/log", checkSignIn, (request, response) => {
   database.find({}, (err, data) => {
     if (err) {
       response.end();
@@ -285,18 +290,18 @@ function checkSignIn(req, res, next) {
   }
 }
 
-app.get("/login", function (req, res) {
+app.get("/api/login", function (req, res) {
   res.render("login", { message: "Please login" });
 });
 
-app.get("/logout", function (req, res) {
+app.get("/api/logout", function (req, res) {
   req.session.destroy(function () {
     console.log("user logged out.");
   });
   res.redirect("/login");
 });
 
-app.post("/login", function (req, res) {
+app.post("/api/login", function (req, res) {
   if (!req.body.id || !req.body.password) {
     res.render("login", { message: "Please enter both id and password" });
   } else if (req.body.id === "Tony" && req.body.password === "Silvestri") {
@@ -309,7 +314,7 @@ app.post("/login", function (req, res) {
 
 //*************************************************************
 
-app.post("/send", async function (req, res) {
+app.post("/api/send", async function (req, res) {
   let statusCode;
   let statusInfo;
   try {

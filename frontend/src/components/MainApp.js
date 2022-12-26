@@ -51,7 +51,7 @@ function MainApp({ tokenVerified, setErrMsg, quickPicks, setQuickPicks }) {
       {quickPicks && (
         <>
           <QuickPickList allowMedia={allowMedia} qp={quickPicks} />
-          <Link to="/send" className="btn btn-primary mb-5">
+          <Link to="send" className="btn btn-primary mb-5">
             Email Results
           </Link>
         </>

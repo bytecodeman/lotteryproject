@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import App from "./App";
 
 const myApp = (
-  <BrowserRouter>
+  <BrowserRouter basename={`${process.env.PUBLIC_URL}`}>
     <App />
   </BrowserRouter>
 );

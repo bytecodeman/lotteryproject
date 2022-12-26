@@ -37,17 +37,15 @@ function JumboTron() {
             </p>
             <p>You can now email the quickpicks!!!</p>
             <p>For amusement only!!!</p>
-            <ul>
-              <li>
-                <a
-                  href="https://github.com/bytecodeman/lotteryproject"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Source Code for Both FrontEnd and BackEnd
-                </a>
-              </li>
-            </ul>
+            <p>
+              <a
+                href="https://github.com/bytecodeman/lotteryproject"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Source Code for Both FrontEnd and BackEnd
+              </a>
+            </p>
             <p>
               <Button variant="primary" onClick={handleShowModal}>
                 About
