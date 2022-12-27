@@ -6,19 +6,17 @@ const path = require("path");
 const fetch = require("node-fetch");
 require("dotenv").config();
 const randomLibrary = require("./randomLibrary");
-const mongo = require("./mongo");
+//const mongo = require("./mongo");
 const { convertToHTML, convertToText } = require("./quickPicksToEmail");
 //const mailer = require("./oauth2mailer");
 const mailer = require("./mailer");
-const cors = require("cors");
+//const cors = require("cors");
 
 const app = express();
-app.use(cors());
+//app.use(cors());
 const port = process.env.PORT || 5000;
 const listener = app.listen(port, "0.0.0.0", () =>
-  console.log(
-    "CORS-enabled web server listening on Port " + listener.address().port
-  )
+  console.log("Express Server listening on Port " + listener.address().port)
 );
 
 app.set("json replacer", function (key, value) {
@@ -95,7 +93,7 @@ function storeInDatabase(operation, data, req) {
     ip,
     timestamp: Date.now(),
   };
-  mongo.logData(logData);
+  //mongo.logData(logData);
 }
 
 function gamesSupported() {
