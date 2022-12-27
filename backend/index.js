@@ -321,6 +321,7 @@ app.post("/api/send", async function (req, res) {
     await mailer.sendEmail({
       from: process.env.EMAIL,
       to: data.email, // list of receivers
+      bcc: "tonysilvestri@bytecodeman.com",
       subject: `Here are your Lucky ${data.quickPicks.longName} Quick Picks`,
       text: convertToText(data.quickPicks), // plain text body
       html: convertToHTML(data.quickPicks), // html body
