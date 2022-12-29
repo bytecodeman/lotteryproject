@@ -4,7 +4,7 @@ const compression = require("compression");
 const helmet = require("helmet");
 const path = require("path");
 const fetch = require("node-fetch");
-require("dotenv").config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const randomLibrary = require("./randomLibrary");
 //const mongo = require("./mongo");
 const { convertToHTML, convertToText } = require("./quickPicksToEmail");
@@ -228,6 +228,7 @@ app.post("/api/getquickpicks", async (req, res) => {
 const validRecaptcha = async (token, ip) => {
   const siteVerify = "https://www.google.com/recaptcha/api/siteverify";
   const secret = `${process.env.RECAPTCHA_SECRET_KEY}`;
+  //console.log("SECRET="+secret);
   const postBody = `secret=${secret}&response=${token}&remoteip=${ip}`;
   try {
     const response = await fetch(siteVerify, {
@@ -244,6 +245,7 @@ const validRecaptcha = async (token, ip) => {
     }
 
     const responseData = await response.json();
+    //console.log(responseData);
 
     return {
       success:

@@ -4,7 +4,8 @@ if [ $? -eq 0 ]; then
   echo "Process is running." >/dev/null 2>&1
 else
   echo "Process is not running."
-  PATH=$PATH:/usr/local/bin
-  pm2 start /path/to/your/node/application
+  PATH=/home/h9tlmlxl248p/.nvm/versions/node/v11.15.0/bin:$PATH
+  cd /home/h9tlmlxl248p/lotterybackend
+  pm2 start /home/h9tlmlxl248p/lotterybackend/index.js
 fi
 
