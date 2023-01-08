@@ -4,7 +4,8 @@ import { Row, Col } from "react-bootstrap";
 import QuickPick from "./QuickPick";
 import "./QuickPickList.css";
 
-const QuickPickList = (props) => {
+const QuickPickList = ({ formData }) => {
+  const { qp, longName, padding } = formData.quickPicks;
   let content = null;
   let header = null;
   let onlyone = "";
@@ -14,14 +15,11 @@ const QuickPickList = (props) => {
       const element = document.querySelector("#results");
       element.scrollIntoView();
     })();
-  }, [props.qp]);
+  }, [qp]);
 
-  if (!props.qp) {
+  if (!qp) {
     content = <p>No QuickPicks Generated</p>;
   } else {
-    const { qp, longName, padding } = props.qp;
-    const allowMedia = props.allowMedia;
-
     if (qp.length === 0) {
       content = <p>No Quick Picks Generated</p>;
     } else if (qp.length === 1) {
@@ -35,7 +33,7 @@ const QuickPickList = (props) => {
         {qp.map((e, i) => (
           <QuickPick
             key={i}
-            allowMedia={allowMedia}
+            allowMedia={formData.allowMedia}
             numbers={e.numbers}
             pball={e.pball}
             padding={padding}

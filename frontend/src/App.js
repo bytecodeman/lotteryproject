@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
 import { ReCaptcha, loadReCaptcha } from "react-recaptcha-v3";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
 import { ToastContainer } from "react-toastify";
 
 import Header from "./components/Header";
@@ -10,12 +10,37 @@ import MainApp from "./components/MainApp";
 import SendResults from "./components/SendResults";
 
 function App() {
-  const [quickPicks, setQuickPicks] = useState(null);
+  const [supportedGames, setSupportedGames] = useState();
   const [tokenVerified, setTokenVerified] = useState();
   const [errMsg, setErrMsg] = useState("");
+  const [formData, setFormData] = useState({
+    quickPicks: null,
+    number: 1,
+    game: "",
+    mustIncludeNumbers: "",
+    desiredPowerBall: "",
+    allowMedia: false,
+  });
 
   useEffect(() => {
     loadReCaptcha(`${process.env.REACT_APP_RECAPTCHA_SITE_KEY}`);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_BASEURL}/supportedgames`
+        );
+        if (!response.ok) {
+          throw new Error(response.status);
+        }
+        const responseData = await response.json();
+        setSupportedGames(responseData.gs.gamesSupported);
+      } catch (error) {
+        setErrMsg("Supported Games went wrong! " + error);
+      }
+    })();
   }, []);
 
   const verifyToken = async (token) => {
@@ -39,27 +64,68 @@ function App() {
       const responseData = await response.json();
       setTokenVerified(responseData.success);
     } catch (error) {
-      setErrMsg(error.message || "Something went wrong!");
+      setErrMsg("VerifyToken went wrong! " + error);
       setTokenVerified(false);
     }
   };
 
-  let appState;
-  let appStateClass;
+  const reloadPage = () => window.location.reload(true);
+
+  let tokenStateDiv;
+  let errMsgDiv;
+  let mainAppDiv;
 
   if (tokenVerified === undefined) {
-    appState = <span>Validating Recaptcha . . .</span>;
+    tokenStateDiv = <div className="h3">Validating Recaptcha . . .</div>;
   } else if (tokenVerified === false) {
-    appState = <span>Captcha Not Validated. Try Reloading the Page.</span>;
-    appStateClass = "error";
-  }
-  if (errMsg) {
-    appState = (
-      <React.Fragment>
-        {appState} <br /> {errMsg}
-      </React.Fragment>
+    tokenStateDiv = (
+      <div className="h3 text-danger fw-bold">
+        Captcha Not Validated. Try Reloading the Page.
+      </div>
     );
-    appStateClass = "error";
+  }
+
+  if (errMsg) {
+    errMsgDiv = <div className="h3 text-danger fw-bold">{errMsg}</div>;
+  }
+
+  if (tokenVerified) {
+    mainAppDiv = (
+      <Switch>
+        {formData.quickPicks && (
+          <Route
+            path="/send"
+            render={(props) => (
+              <SendResults
+                formData={formData}
+                setFormData={setFormData}
+                setErrMsg={setErrMsg}
+                {...props}
+              />
+            )}
+          />
+        )}
+        <Route
+          path="/"
+          render={(props) => (
+            <MainApp
+              supportedGames={supportedGames}
+              formData={formData}
+              setFormData={setFormData}
+              setErrMsg={setErrMsg}
+              {...props}
+            />
+          )}
+        />
+        <Redirect from="/*" to="/" />
+      </Switch>
+    );
+  } else if (tokenVerified === false) {
+    mainAppDiv = (
+      <Button variant="info" className="mt-5" onClick={reloadPage}>
+        Reload Page
+      </Button>
+    );
   }
 
   return (
@@ -72,36 +138,9 @@ function App() {
         <Container>
           <Row>
             <Col>
-              {appState ? <h2 className={appStateClass}>{appState}</h2> : null}
-              <Switch>
-                <Route
-                  path="/"
-                  exact
-                  render={(props) => (
-                    <MainApp
-                      quickPicks={quickPicks}
-                      setQuickPicks={setQuickPicks}
-                      setErrMsg={setErrMsg}
-                      tokenVerified={tokenVerified}
-                      {...props}
-                    />
-                  )}
-                />
-                {quickPicks && (
-                  <Route
-                    path="/send"
-                    render={(props) => (
-                      <SendResults
-                        quickPicks={quickPicks}
-                        setQuickPicks={setQuickPicks}
-                        setErrMsg={setErrMsg}
-                        {...props}
-                      />
-                    )}
-                  />
-                )}
-                <Redirect from="/*" to="/" />
-              </Switch>
+              {tokenStateDiv}
+              {errMsgDiv}
+              {mainAppDiv}
             </Col>
           </Row>
         </Container>

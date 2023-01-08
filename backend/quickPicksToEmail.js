@@ -1,5 +1,6 @@
 const fs = require("fs");
 const vm = require("vm");
+const path = require("path");
 
 const pad = (number, size) => {
   let s = String(number);
@@ -11,7 +12,10 @@ const pad = (number, size) => {
 
 function convertToHTML({ longName, padding, qp }) {
   try {
-    const data = fs.readFileSync("lotteryemailtemplate.txt", "utf8");
+    const data = fs.readFileSync(
+      path.join(__dirname, "lotteryemailtemplate.txt"),
+      "utf8"
+    );
     const template = (template, ctx) => {
       const script = new vm.Script("`" + template + "`");
       return script.runInNewContext(ctx);

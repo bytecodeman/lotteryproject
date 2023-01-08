@@ -4,7 +4,7 @@ const compression = require("compression");
 const helmet = require("helmet");
 const path = require("path");
 const fetch = require("node-fetch");
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 const randomLibrary = require("./randomLibrary");
 //const mongo = require("./mongo");
 const { convertToHTML, convertToText } = require("./quickPicksToEmail");
@@ -152,24 +152,39 @@ app.post("/api/supportedgames", (req, res) => {
 
 function getTheQuickPicks(reqData) {
   let gameIndex;
+  const game = reqData.game.trim().toLowerCase();
   if (
-    typeof reqData.game !== "string" ||
-    reqData.game.trim() === "" ||
+    game === "" ||
     (gameIndex = randomLibrary.gamesSupported
       .map((e) => e.shortname)
-      .indexOf(reqData.game.toLowerCase())) < 0
+      .indexOf(game)) < 0
   ) {
     throw new Error(`Bad Game Specified: ${reqData.game}`);
   }
-  const testNumber = /^\d+$/.test(reqData.number)
-    ? global.parseInt(reqData.number)
-    : NaN;
-  if (testNumber !== testNumber) {
+
+  const testNumber = /^\d+$/.test(reqData.number);
+  if (!testNumber) {
     throw new Error(`Invalid Number of Games: ${reqData.number}`);
   }
-  const game = reqData.game.trim().toLowerCase();
   const number = reqData.number > 25 ? 25 : reqData.number;
-  const qp = randomLibrary.generateQuickPicks(gameIndex, number);
+
+  const mustIncludeNumbers = reqData.mustIncludeNumbers
+    .split(/[\s,]+/)
+    .map((e) => Number(e))
+    .filter(
+      (e) =>
+        e >= randomLibrary.gamesSupported[gameIndex].minnumber &&
+        e <= randomLibrary.gamesSupported[gameIndex].maxnumber
+    );
+
+  const desiredPowerBall = reqData.desiredPowerBall ?? 0;
+
+  const qp = randomLibrary.generateQuickPicks(
+    gameIndex,
+    number,
+    mustIncludeNumbers,
+    desiredPowerBall
+  );
   const padding = randomLibrary.gamesSupported[gameIndex].padding;
   const longName = randomLibrary.gamesSupported[gameIndex].longname;
   return { longName, padding, qp };
@@ -228,7 +243,6 @@ app.post("/api/getquickpicks", async (req, res) => {
 const validRecaptcha = async (token, ip) => {
   const siteVerify = "https://www.google.com/recaptcha/api/siteverify";
   const secret = `${process.env.RECAPTCHA_SECRET_KEY}`;
-  //console.log("SECRET="+secret);
   const postBody = `secret=${secret}&response=${token}&remoteip=${ip}`;
   try {
     const response = await fetch(siteVerify, {
@@ -245,7 +259,6 @@ const validRecaptcha = async (token, ip) => {
     }
 
     const responseData = await response.json();
-    //console.log(responseData);
 
     return {
       success:

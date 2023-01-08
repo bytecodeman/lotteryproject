@@ -6,13 +6,3 @@ body {
   padding: 2rem;
 }
 
-.error {
-  color: red;
-  font-weight: bold;
-}
-
-.modal-90wx {
-  max-width: 500px;
-  width: 80vw;
-  margin: auto;
-}

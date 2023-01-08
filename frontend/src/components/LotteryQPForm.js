@@ -1,97 +1,62 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Row, Col, Form, ButtonGroup, Button } from "react-bootstrap";
-import "./LotteryQPForm.css";
 
-const audio = new Audio("media/success.mp3");
-let saveSupportedGames;
+const audio = new Audio(`${process.env.PUBLIC_URL}/media/success.mp3`);
 
-const LotteryQPForm = (props) => {
-  const [supportedGames, setSupportedGames] = useState();
-  const [number, setNumber] = useState(1);
-  const [game, setGame] = useState("");
-  const [errMsg, setErrMsg] = useState("");
+const LotteryQPForm = ({
+  supportedGames,
+  formData,
+  setFormData,
+  onFormSubmitter,
+  onFormReset,
+}) => {
+  console.log(supportedGames);
 
-  useEffect(() => {
-    (async () => {
-      if (saveSupportedGames) {
-        setSupportedGames(saveSupportedGames);
-      } else {
-        try {
-          const response = await fetch(
-            `${process.env.REACT_APP_BASEURL}/supportedgames`
-          );
-          if (!response.ok) {
-            throw new Error(response.status);
-          }
-          const responseData = await response.json();
-          setSupportedGames(responseData.gs.gamesSupported);
-          saveSupportedGames = responseData.gs.gamesSupported;
-        } catch (error) {
-          setErrMsg(error.message || "Something went wrong!");
-        }
-      }
-    })();
-  }, []);
-
-  const numberChangeHandler = (event) => {
-    setNumber(event.target.value);
+  const textChangeHandler = (event) => {
+    setFormData({ ...formData, [event.target.name]: event.target.value });
   };
 
   const gameClickHandler = (event) => {
-    setGame(event.target.value);
+    setFormData({ ...formData, game: event.target.value });
   };
 
   const effectsClickHandler = (event) => {
-    props.setAllowMedia(event.target.checked);
+    setFormData({ ...formData, allowMedia: event.target.checked });
   };
 
-  const submitClicker = (event) => {
-    if (props.allowMedia) {
-      audio.play();
+  const submitClicker = async (event) => {
+    if (formData.allowMedia) {
+      await audio.play();
     }
-    return true;
   };
 
   const submitQPHandler = (event) => {
     event.preventDefault();
-    if (props.tokenVerified === true) {
-      props.onFormSubmitter(game, number);
-    }
+    onFormSubmitter(formData);
   };
 
   const resetForm = (event) => {
-    setNumber(1);
-    setGame("");
-    props.onFormReset();
-    props.setAllowMedia(false);
+    onFormReset();
   };
-
-  let formLoadState;
-
-  if (!errMsg && !supportedGames) {
-    formLoadState = <h2>Loading Form . . .</h2>;
-  } else if (errMsg) {
-    props.onError("Error Retrieving Supported Games");
-  }
 
   return (
     <React.Fragment>
       <section id="quickpickform">
         <Row>
           <Col>
-            {formLoadState}
-            <Form onReset={resetForm} onSubmit={submitQPHandler}>
+            <Form onSubmit={submitQPHandler} onReset={resetForm}>
               <Form.Group controlId="NoOfQuickPicks" className="mb-4">
                 <Form.Label>No of QuickPicks</Form.Label>
                 <Form.Control
                   type="number"
+                  name="number"
                   min="1"
                   max="25"
                   step="1"
                   placeholder="Enter a number between 1 and 25"
-                  value={number}
+                  value={formData.number}
                   required
-                  onChange={numberChangeHandler}
+                  onChange={textChangeHandler}
                 />
               </Form.Group>
               <Form.Group className="mb-4">
@@ -112,11 +77,41 @@ const LotteryQPForm = (props) => {
                         id={e.shortname}
                         key={e.shortname + "check"}
                         data-padding={e.padding}
-                        required /* checked={game === e.shortname} */
+                        defaultChecked={formData.game === e.shortname}
                         onClick={gameClickHandler}
                       />
                     </div>
                   ))}
+              </Form.Group>
+              <Form.Group className="mb-4">
+                <Form.Label>Numbers to Include in Result</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="mustIncludeNumbers"
+                  placeholder="Enter numbers separated by spaces"
+                  value={formData.mustIncludeNumbers}
+                  pattern="\s*|\s*\d+(\s+\d+)*\s*"
+                  onInvalid={(e) =>
+                    e.target.setCustomValidity("Separate numbers with spaces")
+                  }
+                  onChange={textChangeHandler}
+                />
+              </Form.Group>
+              <Form.Group className="mb-4">
+                <Form.Label>Force Power Ball to this value</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="desiredPowerBall"
+                  min="1"
+                  step="1"
+                  placeholder="Enter an optional number"
+                  value={formData.desiredPowerBall}
+                  pattern="\s*(\d+)?\s*"
+                  onInvalid={(e) =>
+                    e.target.setCustomValidity("Power Ball must be a number")
+                  }
+                  onChange={textChangeHandler}
+                />
               </Form.Group>
               <Form.Group className="mb-4">
                 <Form.Check
@@ -131,7 +126,7 @@ const LotteryQPForm = (props) => {
                   type="submit"
                   variant="primary"
                   onClick={submitClicker}
-                  disabled={!game}
+                  disabled={!formData.game}
                 >
                   Generate Quick Picks
                 </Button>

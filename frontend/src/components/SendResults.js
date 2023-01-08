@@ -6,12 +6,12 @@ import QuickPickList from "./QuickPickList";
 import "react-toastify/dist/ReactToastify.css";
 import "./SendResults.css";
 
-function SendResults({ quickPicks, setQuickPicks, setErrMsg, history }) {
+function SendResults({ formData, setQuickPicks, setErrMsg, history }) {
   const [email, setEmail] = useState("");
   const [formErrors, setFormErrors] = useState(null);
 
   const cancel = () => {
-    history.replace("/");
+    history.replace(`{$process.env.PUBLIC_URL}`);
   };
 
   const emailResults = async () => {
@@ -26,7 +26,7 @@ function SendResults({ quickPicks, setQuickPicks, setErrMsg, history }) {
         setFormErrors(null);
         const response = await fetch(`${process.env.REACT_APP_BASEURL}/send`, {
           method: "POST",
-          body: JSON.stringify({ email, quickPicks }),
+          body: JSON.stringify({ email, quickPicks: formData.quickPicks }),
           headers: {
             "Content-Type": "application/json",
           },
@@ -44,14 +44,13 @@ function SendResults({ quickPicks, setQuickPicks, setErrMsg, history }) {
       } catch (error) {
         setErrMsg(error.message || "Something went wrong!");
       }
-      history.replace("/");
+      history.replace(`{$process.env.PUBLIC_URL}`);
     }
   };
 
   return (
-    <>
-      <QuickPickList allowMedia={false} qp={quickPicks} />
-
+    <React.Fragment>
+      <QuickPickList formData={formData} />
       <Form>
         <Form.Group controlId="email" className="mb-4">
           <Form.Label>Enter Email</Form.Label>
@@ -73,7 +72,7 @@ function SendResults({ quickPicks, setQuickPicks, setErrMsg, history }) {
           </Button>
         </ButtonGroup>
       </Form>
-    </>
+    </React.Fragment>
   );
 }
 
