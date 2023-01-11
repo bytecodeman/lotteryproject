@@ -170,14 +170,20 @@ function getTheQuickPicks(reqData) {
 
   const mustIncludeNumbers = reqData.mustIncludeNumbers
     .split(/[\s,]+/)
+    .filter((e) => e.trim() !== "")
     .map((e) => Number(e))
     .filter(
       (e) =>
         e >= randomLibrary.gamesSupported[gameIndex].minnumber &&
         e <= randomLibrary.gamesSupported[gameIndex].maxnumber
     );
+  if (
+    mustIncludeNumbers.length > randomLibrary.gamesSupported[gameIndex].count
+  ) {
+    throw new Error("Too many numbers to include");
+  }
 
-  const desiredPowerBall = reqData.desiredPowerBall ?? 0;
+  const desiredPowerBall = Number(reqData.desiredPowerBall);
 
   const qp = randomLibrary.generateQuickPicks(
     gameIndex,
@@ -216,23 +222,21 @@ app.get("/api/:game/:number", (req, res) => {
 
 app.post("/api/getquickpicks", async (req, res) => {
   const reqData = req.body;
-  const method = "POST";
   let message;
   let qp;
   let status;
   try {
-    message = "OK";
     qp = getTheQuickPicks(reqData);
+    message = "OK";
     status = 200;
   } catch (error) {
-    message = "ERROR: " + (error.message || "Something went wrong!");
     qp = null;
+    message = error.message;
     status = 422;
   }
   const data = {
-    message,
-    method,
     qp,
+    message,
   };
   storeInDatabase("Gen QP", data, req);
   res.status(status).json(data);

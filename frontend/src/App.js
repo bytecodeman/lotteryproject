@@ -4,6 +4,8 @@ import { ReCaptcha, loadReCaptcha } from "react-recaptcha-v3";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { ToastContainer } from "react-toastify";
 
+import "./App.css";
+
 import Header from "./components/Header";
 import JumboTron from "./components/JumboTron";
 import MainApp from "./components/MainApp";

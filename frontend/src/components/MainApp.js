@@ -23,16 +23,15 @@ function MainApp({ supportedGames, formData, setFormData, setErrMsg }) {
         }
       );
 
-      if (!response.ok) {
-        throw new Error(response.status);
-      }
-
       const responseData = await response.json();
+      if (!response.ok) {
+        throw new Error(responseData.message);
+      }
 
       setErrMsg("");
       setFormData({ ...formData, quickPicks: responseData.qp });
     } catch (error) {
-      setErrMsg("GetQuickPicks went wrong: " + error);
+      setErrMsg("GetQuickPicks went wrong: " + error.message);
       setFormData({ ...formData, quickPicks: null });
     }
   };
